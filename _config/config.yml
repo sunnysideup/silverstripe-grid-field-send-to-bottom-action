@@ -1,0 +1,5 @@
+---
+Name: grid-field-send-to-bottom-action
+After:
+  - '#coreconfig'
+---

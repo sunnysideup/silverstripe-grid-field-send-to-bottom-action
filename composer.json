@@ -1,0 +1,28 @@
+{
+    "name": "sunnysideup/grid-field-send-to-bottom-action",
+    "type": "silverstripe-vendormodule",
+    "description": "grid-field-send-to-bottom-action",
+    "keywords": [
+        "Silverstripe-CMS",
+        "CMS",
+        "Silverstripe",
+        "Gridfield",
+        "Data Objects"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Nicolaas Francken",
+            "email": "modules@sunnysideup.co.nz",
+            "role": "lead developer"
+        }
+    ],
+    "require": {
+        "silverstripe/framework": "~3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sunnysideup\\GridFieldSendToBottomAction\\": "src/"
+        }
+    }
+}
