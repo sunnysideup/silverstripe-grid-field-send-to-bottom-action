@@ -123,12 +123,48 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
             $sortColumn = $this->sortColumn;
             $versionedStage = $this->update_versioned_stage;
             $table = false;
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
             $className = $gridField->getModelClass();
             
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
             $db = Config::inst()->get($className, "db", CONFIG::UNINHERITED);
             if(!empty($db) && array_key_exists($sortColumn, $db)) {
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
                 $table = $className;
             }else {
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
                 $classes = ClassInfo::ancestry($className, true);
                 foreach($classes as $class) {
                     $db = Config::inst()->get($class, "db", CONFIG::UNINHERITED);
@@ -144,6 +180,15 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
                 exit;
             }
 
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
             $baseDataClass = ClassInfo::baseDataClass($className);
 
             self::sendToBottomOfList($table, $sortColumn, $recordID, $versionedStage, $baseDataClass);
@@ -188,14 +233,32 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
             WHERE "ID" = '. $recordID
         );
         
-        if($versionedStage && class_exists($table) && Object::has_extension($table, 'Versioned')) {
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD:  Object:: (case sensitive)
+  * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
+  * EXP: Check if this is the right implementation, this is highly speculative.
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        if($versionedStage && class_exists($table) && SilverStripe\Core\Injector\Injector::inst()->has_extension($table, 'Versioned')) {
             DB::query('
                 UPDATE "' . $table . '_' . $versionedStage . '" 
                 SET "' . $sortColumn . '" = ' . $newSortValue . ' 
                 WHERE "ID" = '. $recordID
             );
             
-            if(Object::has_extension($baseDataClass, 'Versioned')) {
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: (Object:: (ignore case)
+  * NEW: (SS_Object:: (COMPLEX)
+  * EXP: Check usage for Object (PHP) vs SS_Object (Silverstripe)
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+            if(SS_Object::has_extension($baseDataClass, 'Versioned')) {
                 DB::query('
                     UPDATE "' . $baseDataClass . '_' . $versionedStage . '" 
                     SET "LastEdited" = \'' . date('Y-m-d H:i:s') . '\'' . ' 
