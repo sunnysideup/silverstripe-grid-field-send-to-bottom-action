@@ -17,9 +17,7 @@
             "role": "lead developer"
         }
     ],
-    "require": {
-        "silverstripe/framework": "~3.6"
-    },
+    "require": [],
     "autoload": {
         "psr-4": {
             "Sunnysideup\\GridFieldSendToBottomAction\\": "src/"
