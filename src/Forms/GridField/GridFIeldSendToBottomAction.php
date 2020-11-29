@@ -1,5 +1,18 @@
 <?php
 
+namespace Sunnysideup\GridFieldSendToBottomAction\Forms\GridField;
+
+use GridField_ColumnProvider;
+use GridField_ActionProvider;
+use GridField_FormAction;
+use GridField;
+use Config;
+use CONFIG;
+use ClassInfo;
+use DB;
+use SS_Object;
+
+
 class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField_ActionProvider
 {
 
