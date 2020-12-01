@@ -2,19 +2,19 @@
 
 namespace Sunnysideup\GridFieldSendToBottomAction\Forms\GridField;
 
-use GridField_ColumnProvider;
-use GridField_ActionProvider;
-use GridField_FormAction;
-use GridField;
-use Config;
-use CONFIG;
-use ClassInfo;
-use DB;
-use SS_Object;
-
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Extensible;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridField_ActionProvider;
+use SilverStripe\Forms\GridField\GridField_ColumnProvider;
+use SilverStripe\Forms\GridField\GridField_FormAction;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 
 class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField_ActionProvider
 {
+    use Extensible;
 
     protected $sortColumn;
 	protected $update_versioned_stage=null;
@@ -27,7 +27,7 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
 		$this->sortColumn = $sortColumn;
 		$this->update_versioned_stage = $updateVersionStage;
     }
-    
+
     /**
 	 * Add the 'Actions' column if it doesn't already exist
 	 *
@@ -42,7 +42,7 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
 
         return $columns;
     }
-    
+
     /**
 	 * Return any special attributes that will be used for FormField::create_tag()
 	 *
@@ -54,7 +54,7 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
 	public function getColumnAttributes($gridField, $record, $columnName) {
         return array('class' => 'col-buttons');
     }
-    
+
     /**
 	 * Add the title
 	 *
@@ -77,7 +77,7 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
 	public function getColumnsHandled($gridField) {
 		return array('Actions');
 	}
-    
+
     /**
 	 * Which GridField actions are this component handling
 	 *
@@ -87,7 +87,7 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
 	public function getActions($gridField) {
         return array('sendrecordtobottom');
     }
-    
+
     /**
 	 *
 	 * @param GridField $gridField
@@ -99,7 +99,7 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
     {
         if ($columnName === 'Actions') {
             $field = GridField_FormAction::create(
-                $gridField,  
+                $gridField,
                 'SendRecordToBottom'.$record->ID, false, "sendrecordtobottom",
                 [
                     'RecordID' => $record->ID
@@ -107,8 +107,8 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
             )
             ->setAttribute('title', 'Send To Bottom of List')
             ->setDescription('Send To Bottom')
-            ->setAttribute('data-icon', 'chain--arrow');
-                
+            ->addExtraClass('icon font-icon-down-circled');
+
             return $field->Field();
         }
 
@@ -135,149 +135,79 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
             $recordID = $item->ID;
             $sortColumn = $this->sortColumn;
             $versionedStage = $this->update_versioned_stage;
-            $table = false;
+            $tableClass = false;
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $className = $gridField->getModelClass();
-            
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-            $db = Config::inst()->get($className, "db", CONFIG::UNINHERITED);
+
+            $db = Config::inst()->get($className, "db", Config::UNINHERITED);
+
             if(!empty($db) && array_key_exists($sortColumn, $db)) {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-                $table = $className;
+                $tableClass = $className;
             }else {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
                 $classes = ClassInfo::ancestry($className, true);
                 foreach($classes as $class) {
-                    $db = Config::inst()->get($class, "db", CONFIG::UNINHERITED);
+                    $db = Config::inst()->get($class, "db", Config::UNINHERITED);
                     if(!empty($db) && array_key_exists($sortColumn, $db)) {
-                        $table = $class;
+                        $tableClass = $class;
                         break;
                     }
                 }
             }
-            
-            if($table === false) {
+
+            if($tableClass === false) {
                 user_error('Sort column '.$this->sortColumn.' could not be found in '.$gridField->getModelClass().'\'s ancestry', E_USER_ERROR);
                 exit;
             }
 
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: $className (case sensitive)
-  * NEW: $className (COMPLEX)
-  * EXP: Check if the class name can still be used as such
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
             $baseDataClass = ClassInfo::baseDataClass($className);
 
-            self::sendToBottomOfList($table, $sortColumn, $recordID, $versionedStage, $baseDataClass);
-            
+            $this->sendToBottomOfList($tableClass, $sortColumn, $recordID, $versionedStage, $baseDataClass);
+
         }
     }
 
-     /**
-	 * Updates a record in the database with a new value in the sort column  
+    /**
+	 * Updates a record in the database with a new value in the sort column
 	 *
-	 * @param string $table
+	 * @param string $class
 	 * @param string $sortColumn
 	 * @param int recordID
 	 * @param string $versionedStage
      * @param string $baseDataClass
 	 * @return void
 	 */
-    public static function sendToBottomOfList($table, $sortColumn, $recordID, $versionedStage = '', $baseDataClass = '')
+    public function sendToBottomOfList($tableClass, $sortColumn, $recordID, $versionedStage = '', $baseDataClass = '')
     {
+        $baseDataTable = '';
+        $table = DataObject::getSchema()->tableName($tableClass);
+
         if(!$baseDataClass){
-            $baseDataClass = $table;
+            $baseDataTable = $table;
+        }
+        else {
+            $baseDataTable = DataObject::getSchema()->tableName($baseDataClass);
         }
 
         $highestSortValue = DB::query('
             SELECT "' . $sortColumn . '"
-            FROM "' . $table . '" 
-            ORDER BY "' . $table . '"."' . $sortColumn . '" DESC 
+            FROM "' . $table . '"
+            ORDER BY "' . $table . '"."' . $sortColumn . '" DESC
             LIMIT 1
         ')->value();
 
         $newSortValue = intval($highestSortValue) + 1;
 
         DB::query('
-            UPDATE "' . $table . '" 
-            SET "' . $sortColumn . '" = ' . $newSortValue . ' 
+            UPDATE "' . $table . '"
+            SET "' . $sortColumn . '" = ' . $newSortValue . '
             WHERE "ID" = '. $recordID
         );
         //LastEdited
         DB::query('
-            UPDATE "' . $baseDataClass . '" 
-            SET "LastEdited" = \'' . date('Y-m-d H:i:s') . '\'' . ' 
+            UPDATE "' . $baseDataTable . '"
+            SET "LastEdited" = \'' . date('Y-m-d H:i:s') . '\'' . '
             WHERE "ID" = '. $recordID
         );
-        
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD:  Object:: (case sensitive)
-  * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
-  * EXP: Check if this is the right implementation, this is highly speculative.
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-        if($versionedStage && class_exists($table) && SilverStripe\Core\Injector\Injector::inst()->has_extension($table, 'Versioned')) {
-            DB::query('
-                UPDATE "' . $table . '_' . $versionedStage . '" 
-                SET "' . $sortColumn . '" = ' . $newSortValue . ' 
-                WHERE "ID" = '. $recordID
-            );
-            
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: (Object:: (ignore case)
-  * NEW: (SS_Object:: (COMPLEX)
-  * EXP: Check usage for Object (PHP) vs SS_Object (Silverstripe)
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-            if(SS_Object::has_extension($baseDataClass, 'Versioned')) {
-                DB::query('
-                    UPDATE "' . $baseDataClass . '_' . $versionedStage . '" 
-                    SET "LastEdited" = \'' . date('Y-m-d H:i:s') . '\'' . ' 
-                    WHERE "ID" = '. $recordID
-                );
-            }
-        }
     }
 }
