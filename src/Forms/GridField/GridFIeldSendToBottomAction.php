@@ -125,7 +125,6 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     /**
      * Handle the actions and apply any changes to the GridField
      *
-     * @param GridField $gridField
      * @param string $actionName
      * @param mixed $arguments
      * @param array $data - form data
@@ -174,7 +173,6 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     /**
      * Updates a record in the database with a new value in the sort column
      *
-     * @param string $class
      * @param string $sortColumn
      * @param int $tableClass recordID
      * @param string $versionedStage
