@@ -18,7 +18,7 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
 
     protected $sortColumn;
 
-    protected $update_versioned_stage = null;
+    protected $update_versioned_stage;
 
     /**
      * @param string $sortColumn Column that should be used to update the sort information
@@ -160,7 +160,7 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
             }
 
             if ($tableClass === false) {
-                user_error('Sort column ' . $this->sortColumn . ' could not be found in ' . $gridField->getModelClass() . '\'s ancestry', E_USER_ERROR);
+                user_error('Sort column ' . $this->sortColumn . ' could not be found in ' . $gridField->getModelClass() . "'s ancestry", E_USER_ERROR);
                 exit;
             }
 
@@ -183,11 +183,7 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
         $baseDataTable = '';
         $table = DataObject::getSchema()->tableName($tableClass);
 
-        if (! $baseDataClass) {
-            $baseDataTable = $table;
-        } else {
-            $baseDataTable = DataObject::getSchema()->tableName($baseDataClass);
-        }
+        $baseDataTable = $baseDataClass === '' ? $table : DataObject::getSchema()->tableName($baseDataClass);
 
         $highestSortValue = DB::query('
             SELECT "' . $sortColumn . '"
@@ -196,7 +192,7 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
             LIMIT 1
         ')->value();
 
-        $newSortValue = intval($highestSortValue) + 1;
+        $newSortValue = (int) $highestSortValue + 1;
 
         DB::query('
             UPDATE "' . $table . '"
@@ -205,7 +201,7 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
         //LastEdited
         DB::query('
             UPDATE "' . $baseDataTable . '"
-            SET "LastEdited" = \'' . date('Y-m-d H:i:s') . '\'' . '
+            SET "LastEdited" = \'' . date('Y-m-d H:i:s') . "'" . '
             WHERE "ID" = ' . $recordID);
     }
 }
