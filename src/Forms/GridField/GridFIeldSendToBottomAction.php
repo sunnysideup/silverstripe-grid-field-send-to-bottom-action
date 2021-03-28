@@ -180,7 +180,6 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
      */
     public function sendToBottomOfList($tableClass, $sortColumn, $recordID, $versionedStage = '', $baseDataClass = '')
     {
-        $baseDataTable = '';
         $table = DataObject::getSchema()->tableName($tableClass);
 
         $baseDataTable = $baseDataClass === '' ? $table : DataObject::getSchema()->tableName($baseDataClass);
