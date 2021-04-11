@@ -72,6 +72,7 @@ class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField
         if ('Actions' === $columnName) {
             return ['title' => ''];
         }
+
         return [];
     }
 
