@@ -12,7 +12,7 @@ use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 
-class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField_ActionProvider
+class GridFieldSendToBottomAction implements GridField_ColumnProvider, GridField_ActionProvider
 {
     use Extensible;
 
@@ -72,6 +72,7 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
         if ('Actions' === $columnName) {
             return ['title' => ''];
         }
+        return [];
     }
 
     /**
