@@ -21,7 +21,7 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     protected $update_versioned_stage;
 
     /**
-     * @param string $sortColumn Column that should be used to update the sort information
+     * @param string $sortColumn         Column that should be used to update the sort information
      * @param string $updateVersionStage Name of the versioned stage to update this disabled by default unless this is set
      */
     public function __construct($sortColumn, $updateVersionStage = null)
@@ -31,10 +31,10 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     }
 
     /**
-     * Add the 'Actions' column if it doesn't already exist
+     * Add the 'Actions' column if it doesn't already exist.
      *
      * @param GridField $gridField
-     * @param array $columns
+     * @param array     $columns
      */
     public function augmentColumns($gridField, &$columns)
     {
@@ -46,11 +46,12 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     }
 
     /**
-     * Return any special attributes that will be used for FormField::create_tag()
+     * Return any special attributes that will be used for FormField::create_tag().
      *
-     * @param GridField $gridField
+     * @param GridField  $gridField
      * @param DataObject $record
-     * @param string $columnName
+     * @param string     $columnName
+     *
      * @return array
      */
     public function getColumnAttributes($gridField, $record, $columnName)
@@ -59,23 +60,25 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     }
 
     /**
-     * Add the title
+     * Add the title.
      *
      * @param GridField $gridField
-     * @param string $columnName
+     * @param string    $columnName
+     *
      * @return array
      */
     public function getColumnMetadata($gridField, $columnName)
     {
-        if ($columnName === 'Actions') {
+        if ('Actions' === $columnName) {
             return ['title' => ''];
         }
     }
 
     /**
-     * Which columns are handled by this component
+     * Which columns are handled by this component.
      *
      * @param GridField $gridField
+     *
      * @return array
      */
     public function getColumnsHandled($gridField)
@@ -84,9 +87,10 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     }
 
     /**
-     * Which GridField actions are this component handling
+     * Which GridField actions are this component handling.
      *
      * @param GridField $gridField
+     *
      * @return array
      */
     public function getActions($gridField)
@@ -95,14 +99,15 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     }
 
     /**
-     * @param GridField $gridField
+     * @param GridField  $gridField
      * @param DataObject $record
-     * @param string $columnName
+     * @param string     $columnName
+     *
      * @return string - the HTML for the column
      */
     public function getColumnContent($gridField, $record, $columnName)
     {
-        if ($columnName === 'Actions') {
+        if ('Actions' === $columnName) {
             $field = GridField_FormAction::create(
                 $gridField,
                 'SendRecordToBottom' . $record->ID,
@@ -114,7 +119,8 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
             )
                 ->setAttribute('title', 'Send To Bottom of List')
                 ->setDescription('Send To Bottom')
-                ->addExtraClass('icon font-icon-down-circled');
+                ->addExtraClass('icon font-icon-down-circled')
+            ;
 
             return $field->Field();
         }
@@ -123,15 +129,15 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     }
 
     /**
-     * Handle the actions and apply any changes to the GridField
+     * Handle the actions and apply any changes to the GridField.
      *
      * @param string $actionName
-     * @param mixed $arguments
-     * @param array $data - form data
+     * @param mixed  $arguments
+     * @param array  $data       - form data
      */
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
-        if ($actionName === 'sendrecordtobottom') {
+        if ('sendrecordtobottom' === $actionName) {
             $item = $gridField->getList()->byID($arguments['RecordID']);
             if (! $item) {
                 return;
@@ -154,12 +160,13 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
                     $db = Config::inst()->get($class, 'db', Config::UNINHERITED);
                     if (! empty($db) && array_key_exists($sortColumn, $db)) {
                         $tableClass = $class;
+
                         break;
                     }
                 }
             }
 
-            if ($tableClass === false) {
+            if (false === $tableClass) {
                 user_error('Sort column ' . $this->sortColumn . ' could not be found in ' . $gridField->getModelClass() . "'s ancestry", E_USER_ERROR);
                 exit;
             }
@@ -171,18 +178,19 @@ class GridFIeldSendToBottomAction implements GridField_ColumnProvider, GridField
     }
 
     /**
-     * Updates a record in the database with a new value in the sort column
+     * Updates a record in the database with a new value in the sort column.
      *
      * @param string $sortColumn
-     * @param int $tableClass recordID
+     * @param int    $tableClass     recordID
      * @param string $versionedStage
      * @param string $baseDataClass
+     * @param mixed  $recordID
      */
     public function sendToBottomOfList($tableClass, $sortColumn, $recordID, $versionedStage = '', $baseDataClass = '')
     {
         $table = DataObject::getSchema()->tableName($tableClass);
 
-        $baseDataTable = $baseDataClass === '' ? $table : DataObject::getSchema()->tableName($baseDataClass);
+        $baseDataTable = '' === $baseDataClass ? $table : DataObject::getSchema()->tableName($baseDataClass);
 
         $highestSortValue = DB::query('
             SELECT "' . $sortColumn . '"
